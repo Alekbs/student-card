@@ -8,9 +8,9 @@
       "Group": "CS101"
     },
     "Address": {
-      "City": "New York",
-      "PostIndex": "10001",
-      "Street": "Broadway"
+      "City": "Stavropol",
+      "PostIndex": "11110",
+      "Street": "Pushkina"
     },
     "Contacts": {
       "Phone": "+1 (555) 123-4567",
@@ -166,7 +166,7 @@
     "Curriculum": {
       "Faculty": "Humanities",
       "Speciality": "English Literature",
-      "Cource": "2",
+      "Cource": "5",
       "Group": "ENG202"
     },
     "Address": {
@@ -177,6 +177,24 @@
     "Contacts": {
       "Phone": "+1 (555) 567-8901",
       "Email": "emily.brown@example.com"
+    }
+  },
+  {
+    "FIO": "Ivan Ivanov",
+    "Curriculum": {
+      "Faculty": "2",
+      "Speciality": "Psychology",
+      "Cource": "2",
+      "Group": "PSI22"
+    },
+    "Address": {
+      "City": "Stavropol",
+      "PostIndex": "22222",
+      "Street": "Morozova"
+    },
+    "Contacts": {
+      "Phone": "89182345623",
+      "Email": "ivan@mail.ru"
     }
   }
 ]
