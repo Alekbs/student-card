@@ -16,17 +16,12 @@ namespace StudentCard
                 while (true)
                 {
 
-                    Console.Write("\nВведите команду: ");
-                    string input = Console.ReadLine();
+                    string input = GetInput("\nВведите команду: ");
                     string[] parts = input.Split(' ');
 
                     if (parts.Length > 0)
                     {
                         ParseCommand(parts, filePath);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Пустая команда.");
                     }
                 }
             }
@@ -34,8 +29,7 @@ namespace StudentCard
             {
                 Console.WriteLine("Произошла ошибка: " + ex.Message);
             }
-
-            Console.ReadLine();
+            GetInput();
         }
 
         /// <summary>
@@ -62,14 +56,34 @@ namespace StudentCard
                     break;
                 case "filter":
                     var paramDict = ParseParameters(parameter);
-                    var filteredStudents = FilterStudents(
-                        students,
-                        paramDict.GetValueOrDefault("faculty"),
-                        paramDict.GetValueOrDefault("speciality"),
-                        paramDict.GetValueOrDefault("cource"),
-                        paramDict.GetValueOrDefault("group")
-                    );
-                    ViewAll(filteredStudents);
+
+                    // Проверяем наличие хотя бы одного параметра
+                    if (paramDict.ContainsKey("faculty") ||
+                        paramDict.ContainsKey("speciality") ||
+                        paramDict.ContainsKey("cource") ||
+                        paramDict.ContainsKey("group"))
+                    {
+                        var filteredStudents = FilterStudents(
+                            students,
+                            paramDict.GetValueOrDefault("faculty"),
+                            paramDict.GetValueOrDefault("speciality"),
+                            paramDict.GetValueOrDefault("cource"),
+                            paramDict.GetValueOrDefault("group")
+                        );
+                        if (filteredStudents.Count == 0)
+                        {
+                            Console.WriteLine("Таких студентов нет");
+                        }
+                        else
+                        {
+                            ViewAll(filteredStudents);
+                        }
+                    }
+                    else
+                    {
+                        // Если параметры отсутствуют, отображаем всех студентов
+                        Console.WriteLine("Введите параметры фильтрации.");
+                    }
                     break;
                 case "view_name":
                     ViewName(students);
@@ -153,39 +167,47 @@ namespace StudentCard
         {
 
             Student student = new Student();
-
-            Console.Write("Введите ФИО: ");
-            student.FIO = Console.ReadLine();
+            student.FIO = GetInput("Введите ФИО: ");
 
             student.Curriculum = new Curriculum();
-            Console.Write("Введите факультет: ");
-            student.Curriculum.Faculty = Console.ReadLine();
-            Console.Write("Введите специальность: ");
-            student.Curriculum.Speciality = Console.ReadLine();
-            Console.Write("Введите курс: ");
-            student.Curriculum.Cource = Console.ReadLine();
-            Console.Write("Введите группу: ");
-            student.Curriculum.Group = Console.ReadLine();
+            student.Curriculum.Faculty = GetInput("Введите факультет: ");
+            student.Curriculum.Speciality = GetInput("Введите специальность: ");
+            student.Curriculum.Cource = GetInput("Введите курс: ");
+            student.Curriculum.Group = GetInput("Введите группу: ");
 
             student.Address = new Address();
-            Console.Write("Введите город: ");
-            student.Address.City = Console.ReadLine();
-            Console.Write("Введите почтовый индекс: ");
-            student.Address.PostIndex = Console.ReadLine();
-            Console.Write("Введите улицу: ");
-            student.Address.Street = Console.ReadLine();
+            student.Address.City = GetInput("Введите город: ");
+            student.Address.PostIndex = GetInput("Введите почтовый индекс: ");
+            student.Address.Street = GetInput("Введите улицу: ");
 
             student.Contacts = new Contacts();
-            Console.Write("Введите телефон: ");
-            student.Contacts.Phone = Console.ReadLine();
-            Console.Write("Введите email: ");
-            student.Contacts.Email = Console.ReadLine();
+            student.Contacts.Phone = GetInput("Введите телефон: ");
+            student.Contacts.Email = GetInput("Введите email: ");
 
             student.Display();
             students.Add(student);
 
             SaveStudentsToJson(students, filePath);
             Console.WriteLine("Студент добавлен.");
+        }
+
+        /// <summary>
+        /// Проверка ввода на пустое значение.
+        /// </summary> 
+        static string GetInput(string prompt = null)
+        {
+            string input;
+            do
+            {
+                Console.Write(prompt);
+                input = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    Console.WriteLine("Ввод не должен быть пустым. Пожалуйста, попробуйте снова.");
+                    input = GetInput(prompt);
+                }
+            } while (string.IsNullOrWhiteSpace(input));
+            return input;
         }
 
         /// <summary>
@@ -224,7 +246,7 @@ namespace StudentCard
             while (true)
             {
                 Console.Write("\nВведите команду: ");
-                string input = Console.ReadLine();
+                string input = GetInput();
                 if (input.ToLower() == "end")
                     break;
 
@@ -298,57 +320,5 @@ namespace StudentCard
             List<Student> students = JsonConvert.DeserializeObject<List<Student>>(json);
             return students;
         }
-    }
-
-    public class Student
-    {
-        public string FIO { get; set; }
-        public Curriculum Curriculum { get; set; }
-        public Address Address { get; set; }
-        public Contacts Contacts { get; set; }
-
-        /// <summary>
-        /// Выводит информацию о студенте.
-        /// </summary>      
-        public void Display()
-
-        {
-            // Вывод информации на экран
-            Console.WriteLine("FIO: " + (FIO ?? "N/A"));
-            Console.WriteLine("Curriculum:");
-            Console.WriteLine("    Faculty: " + (Curriculum?.Faculty ?? "N/A"));
-            Console.WriteLine("    Speciality: " + (Curriculum?.Speciality ?? "N/A"));
-            Console.WriteLine("    Cource: " + (Curriculum?.Cource ?? "N/A"));
-            Console.WriteLine("    Group: " + (Curriculum?.Group ?? "N/A"));
-            Console.WriteLine("Address:");
-            Console.WriteLine("    City: " + (Address?.City ?? "N/A"));
-            Console.WriteLine("    PostIndex: " + (Address?.PostIndex ?? "N/A"));
-            Console.WriteLine("    Street: " + (Address?.Street ?? "N/A"));
-            Console.WriteLine("Contacts:");
-            Console.WriteLine("    Phone: " + (Contacts?.Phone ?? "N/A"));
-            Console.WriteLine("    Email: " + (Contacts?.Email ?? "N/A") + "\n");
-
-        }
-    }
-
-    public class Curriculum
-    {
-        public string Faculty { get; set; }
-        public string Speciality { get; set; }
-        public string Cource { get; set; }
-        public string Group { get; set; }
-    }
-
-    public class Address
-    {
-        public string City { get; set; }
-        public string PostIndex { get; set; }
-        public string Street { get; set; }
-    }
-
-    public class Contacts
-    {
-        public string Phone { get; set; }
-        public string Email { get; set; }
     }
 }
